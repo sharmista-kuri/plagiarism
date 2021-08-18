@@ -29,15 +29,6 @@
             .shadow{
                 box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
             }
-            /* .filepond--file-action-button {
-                cursor: pointer;
-            } */
-
-            /* .filepond--root, .filepond--drop-label {
-                cursor: pointer;
-                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial,
-                    sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
-            } */
             
         </style>
 
