@@ -1,4 +1,5 @@
 <?php
+    define('SERVER_URL', "http://localhost/plagiarism/");
 
     $serverName="localhost";
     $userName="root";
