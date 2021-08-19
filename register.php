@@ -1,7 +1,8 @@
 <?php session_start();?>
 <?php
     include "config.php"; 
-
+    include "send_mail.php"; 
+    
     //echo'<pre>';print_r($_POST['email']);exit;
 	if(isset($_POST['register'])){
 		$username = $_POST['username'];
@@ -9,16 +10,33 @@
 		$password = $_POST['password'];
 		$user_type = $_POST['user_type'];
 
-		$query="INSERT INTO `user_tbl` (`username`,`email`, `password`,`user_type`) VALUES ('$username','$email', '$password','$user_type')";
+    $tempQuery='SELECT * FROM `user_tbl` WHERE email="'.$email.'"';
+      
+    $temp=mysqli_query($link,$tempQuery);
+    
+    if(mysqli_num_rows($temp) > 0)
+    {
+  
+          $error="You are already registered.";
+
+          $_SESSION['msg_reg']=$error;
+			    echo("<script>location.href = 'register.php';</script>");
+    }
+
+    $permitted_chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    $code = substr(str_shuffle($permitted_chars), 0, 20);
+		
+    
+    $query="INSERT INTO `user_tbl` (`username`,`email`, `password`,`user_type`,`code`) VALUES ('$username','$email', '$password','$user_type','$code')";
 			
 		$result=mysqli_query($link,$query);
 
 
 		if($result){
-			$permitted_chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-
-            $code = substr(str_shuffle($permitted_chars), 0, 20);
-			send($username,$email,$code);
+			  
+			  send_fn($username,$email,$code);
+        $_SESSION['msg_reg']="Please Verify Your Email";
+			  echo("<script>location.href = 'register.php';</script>");
 			//echo("<script>location.href = 'index.php';</script>");
 		} else{
 			
@@ -34,16 +52,13 @@
 
 <?php
     
-    function send($name,$email,$code){
-
-        
-
-            include("brandop.php");
-
-            $obj = new OS_BR();
+    function send_fn($name,$email,$code){
+           
+            $send = new Send_Mail();
+   
 
             $to = $email; 
-            $from = 'co_letter@du.ac.bd'; 
+            //$from = 'co_letter@du.ac.bd'; 
             $fromName = "Exam Controller Office,University Of Dhaka"; 
              
             $subject = "Verify Email"; 
@@ -500,7 +515,7 @@
                         <tr>
                           <td class="email-masthead" style="word-break: break-word; font-family: &quot;Nunito Sans&quot;, Helvetica, Arial, sans-serif; font-size: 16px; text-align: center; padding: 25px 0;" align="center">
                             <a href="localhost:82/spl" class="f-fallback email-masthead_name" style="color: #A8AAAF; font-size: 16px; font-weight: bold; text-decoration: none; text-shadow: 0 1px 0 white;">
-                            Postal Automation System,Office of the Registrar,University Of Dhaka.
+                            Office of the Registrar,University Of Dhaka.
                           </a>
                           </td>
                         </tr>
@@ -530,7 +545,7 @@
                                         </td>
                                       </tr>
                                     </table>
-                                    <p style="font-size: 16px; line-height: 1.625; color: #51545E; margin: .4em 0 1.1875em;">For security, this request was received from a <a>'. $obj->showInfo("os") .'</a> device using <a>'. $obj->showInfo("browser").'</a>. If you did not request a email verification, please ignore this email or <a href="" style="color: #3869D4;">contact support</a> if you have questions.</p>
+                                    
                                     <p style="font-size: 16px; line-height: 1.625; color: #51545E; margin: .4em 0 1.1875em;">Thanks,
                                       <br />Exam Controller Office,University Of Dhaka.</p>
                                   </div>
@@ -544,7 +559,7 @@
                             <table class="email-footer" align="center" width="570" cellpadding="0" cellspacing="0" role="presentation" style="width: 570px; -premailer-width: 570px; -premailer-cellpadding: 0; -premailer-cellspacing: 0; text-align: center; margin: 0 auto; padding: 0;">
                               <tr>
                                 <td class="content-cell" align="center" style="word-break: break-word; font-family: &quot;Nunito Sans&quot;, Helvetica, Arial, sans-serif; font-size: 16px; padding: 45px;">
-                                  <p class="f-fallback sub align-center" style="font-size: 13px; line-height: 1.625; text-align: center; color: #A8AAAF; margin: .4em 0 1.1875em;" align="center">© 2020 [Postal Automation System]. All rights reserved.</p>
+                                  <p class="f-fallback sub align-center" style="font-size: 13px; line-height: 1.625; text-align: center; color: #A8AAAF; margin: .4em 0 1.1875em;" align="center">© 2021 [Plagiarism System]. All rights reserved.</p>
                                   <p class="f-fallback sub align-center" style="font-size: 13px; line-height: 1.625; text-align: center; color: #A8AAAF; margin: .4em 0 1.1875em;" align="center">
                                     Exam Controller Office
                                     <br />Registrar Building
@@ -565,39 +580,10 @@
             // Set content-type header for sending HTML email 
             $headers = "MIME-Version: 1.0" . "\r\n"; 
             $headers .= "Content-type:text/html;charset=UTF-8" . "\r\n"; 
-             
-            // Additional headers 
-            $headers .= 'From: '.$fromName.'<'.$from.'>' . "\r\n"; 
-             
-            // Send email
-
-            require $_SERVER['DOCUMENT_ROOT'].'/PHPMailer/PHPMailerAutoload.php';
-            $mail = new PHPMailer();
-            $mail->isHTML(true);
-            $mail->AddAddress($to);
-            $mail->Subject = $subject;
-            $mail->msgHTML($htmlContent);
-            //$mail->Body = $htmlContent;
-            if (!$mail->send())
-            {
-               /* PHPMailer error. */
-               echo $mail->ErrorInfo;
-            }
-            else{
-              $sucess=$sucess."A recovery email has been sent to your provided mail account<br>";
-            }
- 
-            /*if(mail($to, $subject, $htmlContent, $headers)){ 
-                
-                $sucess=$sucess."A recovery email has been sent to your provided mail account<br>";
+            
+            $output = $send->send_mail_function($email,$subject,$htmlContent);    
            
-            }*/
-
-    
-
-        
-
-
+           
 
     }
 
@@ -675,7 +661,7 @@
 					</div>
 
 					<div class="wrap-input100 validate-input" data-validate = "User Type is required">
-						<select class="input100" name="user_type">
+						<select class="input100" name="user_type" style="border: none;">
 							<option value="">User Type</option>
 							<option value="admin">Admin</option>
 							<option value="user">User</option>

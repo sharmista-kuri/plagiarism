@@ -108,29 +108,13 @@ if($request == 2){
     $record = mysqli_query($link,"SELECT id FROM $table WHERE id=".$id);
     if(mysqli_num_rows($record) > 0){
 
-        $reply = mysqli_escape_string($link,trim($_POST['reply']));
-      
 
-        if( $reply != ''){
+        $sql = "UPDATE $table SET admin_verified=1  WHERE id=".$id;
+        mysqli_query($link, $sql);
 
-            if($reply==1){
-                $reply_sts = 0;
-            }
-            else{
-                $reply_sts = 1;
-            }
-            $reply_by = $_SESSION['name'];
-            $reply_dt = date("d/m/Y h:i:sa");
-
-            $sql = "UPDATE $table SET reply_sts=$reply_sts, reply_by='$reply_by', reply_dt='$reply_dt'  WHERE id=".$id;
-            mysqli_query($link, $sql);
-
-            echo json_encode( array("status" => 1,"message" => "Record updated.") );
-            exit;
-        }else{
-            echo json_encode( array("status" => 0,"message" => "Please fill all fields.") );
-            exit;
-        }
+        echo json_encode( array("status" => 1,"message" => "Record updated.") );
+        exit;
+        
         
     }else{
         echo json_encode( array("status" => 0,"message" => "Invalid ID.") );
