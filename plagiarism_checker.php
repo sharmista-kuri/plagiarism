@@ -165,6 +165,8 @@
         }
 
         function checking(){
+            $("#datatable tbody").html("");
+            $('#datatable').DataTable();
             
             //alert("hi");
             var form = $('#file_form')[0];
@@ -174,7 +176,7 @@
 
             pondFiles = pond.getFiles();
  
-            console.log(pondFiles[0].file);
+            //console.log(pondFiles[0].file);
 
 
             var guid = "";
@@ -188,7 +190,7 @@
             data.append( 'file_upload', pondFiles[0].file );
             data.append( 'GUID', GUID);
             data.append( 'top', $("#top").val());
-            console.log(data);
+            //console.log(data);
             url = "plagiarism_checker_checking.php";
            
             jQuery.ajax({
@@ -203,12 +205,12 @@
                 success: function(data){
                     console.log(data);
                     datas = $.parseJSON(data);
-                    console.log(datas);
+                    //console.log(datas);
                     var str="";
                     var name = "query";
                     var query = "";
                     var i = 0;
-                    var n = 200;
+                    var n = 2000000;
                     var dir = "<?=$PATH?>";
                     
                     $("#tbody").html("");
@@ -226,9 +228,9 @@
                         }
                         else{
                             i++;
-                            console.log(value['id']);
-                            console.log(value['value']);
-                            console.log(value['percentage']);
+                            //console.log(value['id']);
+                            //console.log(value['value']);
+                            //console.log(value['percentage']);
                             name = value['value'];
 
                             name =  name.replace('"', ' ');
@@ -244,7 +246,7 @@
                             file_path = $("#file_path").val();
                             
                            
-                            console.log(file_path);
+                            //console.log(file_path);
 
                             
 
@@ -265,20 +267,15 @@
                         
                     });
                     $("#datatable tbody").append(str);
-                    
-                    $('#datatable').DataTable();
-                    $("#counter").val(i);
-                    
-                   
+
                     for(j=1; j<=i; j++){
                         create_canvas(j);
                     }
-                    
 
+                    $("#counter").val(i);
+                    $('#datatable').DataTable();
                     
-
-                    
-
+                
                     
                 },
                 error: function(data) {
@@ -292,13 +289,13 @@
         }
 
         function indexing(){
-            console.log("hi");
+            //console.log("hi");
             //alert("hi");
             
             var form = $('#file_form')[0];
 		    var data = new FormData(form);
             //console.log(file_upload.files[0]);
-            console.log(form);
+            //console.log(form);
 
             var guid = "";
 

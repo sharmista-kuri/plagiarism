@@ -5,11 +5,12 @@ function crawl_page($url, $depth = 5)
     static $seen = array();
     if (isset($seen[$url]) || $depth === 0) {
         return;
+        echo 'END';
     }
 
     $seen[$url] = true;
 
-    echo "URL: ".$url;
+    //echo "URL: ".$url;
 
     $dom = new DOMDocument('1.0');
     @$dom->loadHTMLFile($url);
@@ -47,10 +48,8 @@ function crawl_page($url, $depth = 5)
 
                 if($parts['host']!='bn.wikipedia.org'){
                     return;
-                    echo $parts['host'];
+                    //echo $parts['host'];
                 }
-
-                
 
                 $href = $parts['scheme'] . '://';
                 if (isset($parts['user']) && isset($parts['pass'])) {
@@ -75,10 +74,15 @@ function crawl_page($url, $depth = 5)
 
     //echo "URL:",$url,PHP_EOL,"CONTENT:",PHP_EOL,$dom->saveHTML(),PHP_EOL,PHP_EOL;
 }
-crawl_page("https://bn.wikipedia.org/wiki/কোভিড-১৯_এর_বৈশ্বিক_মহামারী", 2);
+
+$url = "https://bn.wikipedia.org/wiki/ঢাকা_বিশ্ববিদ্যালয়";
+crawl_page($url, 5);
+
+
 
 function write($txt){
     $myfile = fopen("scrape_file.txt", "a") or die("Unable to open file!");
     fwrite($myfile, $txt);
     fclose($myfile);
 }
+

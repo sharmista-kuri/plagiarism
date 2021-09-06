@@ -108,7 +108,7 @@ elseif($File_Ext==".pdf")
 }
 $res = curlSendFile(new CURLFile($file_name), $url);
 
-$url = "http://127.0.0.1:8080/api/example/store";
+$url = "http://127.0.0.1:8081/api/example/store";
 $res_java = curlSendText($res, $url, $GUID);
  
 echo $NewFileNameEnq;

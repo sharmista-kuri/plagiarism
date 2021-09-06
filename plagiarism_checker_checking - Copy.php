@@ -106,7 +106,7 @@ $NewFileNameEnq = "";
 
 
 $GUID = $_POST['GUID'];
-$top = $_POST['top'];
+
 
 if(!empty($_FILES) && $_FILES['file_upload']['name'] !="" && $_FILES['file_upload']['tmp_name']!="")
 {
@@ -139,161 +139,130 @@ elseif($File_Ext==".pdf")
 }
 $res = curlSendFile(new CURLFile($file_name), $url);
 
-$url = "http://127.0.0.1:8081/api/example/search";
-$res_java = curlSendText($res, $url, $top);
 
+//function search_function($res)
+{
+    $top = $_POST['top'];
+    $url = "http://127.0.0.1:8081/api/example/search";
+    $res_java = curlSendText($res, $url, $top);
 
-
-$query = $res;
-$arr = json_decode($res_java, true);
-
-
-
-$json = json_decode($res_java, true);
-
-$query_explode = explode("।",$query);
-$size = sizeof($query_explode);
-
-$query = str_replace('"','',$query);
-
-//  print_r($json);
-
-$p_array = [];
-$name_array = [];
-$id_array = [];
-
-$firstArray[] = array();
-$myArray[] = array("query"=>$query);
-$percentage = 0;
-$flag=0;
-$counter = 0;
+    $query = $res;
 
 
 
 
-foreach($json as $key=>$value){
-    //echo $key;
-    //print_r ($value);
-    if($key=="counter"){
-        if($value!="0"){
-            $flag=1;
-            $counter = $value;
-        }
-    }
-}
-foreach($json as $key=>$value){
-    if($flag){ 
-        if($key!="counter"){
-            //echo'<pre>';print_r($key);
+    $json = json_decode($res_java, true);
+
+    print_r($json);
+    $p_array = [];
+    $name_array = [];
+    $id_array = [];
+
+    $firstArray[] = array();
+    $myArray[] = array("query"=>$query);
+    $percentage = 0;
+    foreach($json as $key=>$value)
+    {
+        //echo $key;
+
+        if($key=="data"){
             foreach ($value as $key1 => $value1) {
                 
-                //print_r($value1['score']);
+                //print_r($value1['id']);
                 //echo '</br>';
-
-                $score = $value1['score'];
-                $query = $value1['query'];
-                $text = $value1['value'];
                 $id = $value1['id'];
-                $matched_value = "";
-
-                $text = substr_replace($text ,"",-1);
-                $res = substr_replace($res ,"",-1);
-
-                $text = str_replace('"','',$text);
-                $res = str_replace('"','',$res);
-
-                /* echo 'res: '.$res; 
-                echo 'text: '.$text;  */
+                $text = $value1['value'];
 
 
-                $text_explode = explode("।",$text);
+                $url = "http://127.0.0.1:5000/api/compare";
+                $percentage = curlCompare($text, $query, $url);
 
-                $c=0;
-
-                foreach($text_explode as $result){
-
-                    $check = check_match($result,$res);
-                    if($check!==""){
-                        $c++;
-                    }
-                    
-                    $matched_value.= $check."।";
-                    
-                    
-                }   
-                //echo 'matched: '.$c; 
                 
-                
-                if($matched_value!==""){
-                    
-                    $percentage = 100-(($size-$c)*100)/$size;
-                    $percentage = number_format((float)$percentage, 2, '.', ''); 
-                    //echo 'matched: '.$left;  
-                    $myArray[] = array("id" => $id,"value" => $matched_value, "percentage" => $percentage);
-                }
-                
+                $myArray[] = array("id" => $id,"value" => $text, "percentage" => $percentage);
 
-
+                //print_r($firstArray);
                 
             }
         }
-        
     }
+
+
+
+    //echo $query;
+    //convert to json
+    $json = json_encode($myArray, JSON_UNESCAPED_UNICODE);
+
+    //return $json;
+    echo $json;
+
 }
 
 
-function check_match($result,$query){
-    $matched_value = "";
-    $query_explode = explode("।",$query);
-    foreach($query_explode as $query){
-        if (strcmp($query, $result) !== 0) {
-            //$matched_value.=$result;
-        }
-        else {
-            $matched_value.=$result;
+/* $res_explode = explode("।",$res);
 
+//echo'<pre>';print_r($res_explode);exit;
+//search_function($res);
+foreach($res_explode as $result){
+    $str = search_function($result);
+    echo json_encode($str, JSON_UNESCAPED_UNICODE);
+}
+
+function search_function($res){
+    $top = $_POST['top'];
+    $url = "http://127.0.0.1:8081/api/example/search";
+    $res_java = curlSendText($res, $url, $top);
+
+    $query = $res;
+
+
+
+
+    $json = json_decode($res_java, true);
+
+    print_r($json);
+    $p_array = [];
+    $name_array = [];
+    $id_array = [];
+
+    $firstArray[] = array();
+    $myArray[] = array("query"=>$query);
+    $percentage = 0;
+    foreach($json as $key=>$value)
+    {
+        //echo $key;
+
+        if($key=="data"){
+            foreach ($value as $key1 => $value1) {
+                
+                //print_r($value1['id']);
+                //echo '</br>';
+                $id = $value1['id'];
+                $text = $value1['value'];
+
+
+                $url = "http://127.0.0.1:5000/api/compare";
+                $percentage = curlCompare($text, $query, $url);
+
+                
+                $myArray[] = array("id" => $id,"value" => $text, "percentage" => $percentage);
+
+                //print_r($firstArray);
+                
+            }
         }
     }
-    
-    return $matched_value;
-} 
 
-//print_r($myArray);
 
-/* foreach($json as $key=>$value)
-{
-    //echo $key;
 
-    if($key=="data"){
-        foreach ($value as $key1 => $value1) {
-            
-            //print_r($value1['id']);
-            //echo '</br>';
-            $id = $value1['id'];
-            $text = $value1['value'];
-    
+    //echo $query;
+    //convert to json
+    $json = json_encode($myArray, JSON_UNESCAPED_UNICODE);
 
-            $url = "http://127.0.0.1:5000/api/compare";
-            $percentage = curlCompare($text, $query, $url);
-
-            
-
-            
-            $myArray[] = array("id" => $id,"value" => $text, "percentage" => $percentage);
-
-            //print_r($firstArray);
-            
-        }
-    }
+    return $json;
+    //echo $json;
 } */
 
 
-
-//echo $query;
-//convert to json
-$json = json_encode($myArray, JSON_UNESCAPED_UNICODE);
-
-echo $json;
 
 
 
