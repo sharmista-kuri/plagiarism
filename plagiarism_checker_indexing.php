@@ -16,12 +16,13 @@ function curlSendFile(CURLFile $file, $url = '', $key = "123456")
     return postCurl($url, $post_data);
 }
 
-function curlSendText($text = '', $url = '', $GUID="0")
+function curlSendText($text = '', $url = '', $GUID="0",$type = "file")
 {
     if ($text == '' || $url == '')
         return false;
     $post_data = [];
     $post_data["text"] = $text;
+    $post_data["type"] = $type;
     $post_data["GUID"] = $GUID;
     return postCurlJava($url, $post_data);
 }
@@ -101,13 +102,31 @@ $url = "";
 if($File_Ext==".doc"||$File_Ext==".docx")
 {
     $url = "http://127.0.0.1:5000/api/parsing/doc";
+    $res = curlSendFile(new CURLFile($file_name), $url);
 }
 elseif($File_Ext==".pdf")
 {
     $url = "http://127.0.0.1:5000/api/parsing/pdf";
+    $res = curlSendFile(new CURLFile($file_name), $url);
 }
-$res = curlSendFile(new CURLFile($file_name), $url);
 
+elseif($File_Ext==".txt")
+{
+    $fh = fopen($file_name,'r');
+    $str = "";
+    while ($line = fgets($fh)) {
+        $str.=$line;
+    }
+    fclose($fh);
+    $res = $str;
+}
+
+
+$res = substr_replace($res ,"",-1);
+$res = rtrim($res, '"');
+$res = ltrim($res, '"');
+//echo $res;exit;
+$type = "file";
 $url = "http://127.0.0.1:8081/api/example/store";
 $res_java = curlSendText($res, $url, $GUID);
  

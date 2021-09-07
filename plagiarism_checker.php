@@ -2,6 +2,17 @@
 <?php
     $PATH = "http://localhost/plagiarism/document_file/";
 ?>
+<?php
+    $show=0;
+    if(isset($_SESSION)){?>
+        <?php
+        if(isset($_SESSION['user_type'])){
+            if(isset($_SESSION['user_type'])=='admin'){
+                $show=1;
+            }
+        } 
+    } 
+?>
 <html>
     <head>
         <title>Plagiarism</title>
@@ -61,9 +72,13 @@
                         <li class="nav-item active">
                             <a class="nav-link" href="plagiarism_checker.php">Plagiarism <span class="sr-only">(current)</span></a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="verify.php">Verification</a>
-                        </li>
+                        <?php 
+                            if($show){?>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="verify.php">Verification</a>
+                                </li>
+                        <?php } ?>
+                        
                     </ul>
                 
                     
@@ -97,18 +112,30 @@
                                
                             </div>
                             <div class="p-3 mb-3">
-                                Search Maximum: <input type="text" id="top" name="top" value="10">
+                                <?php 
+                                    if($show){?>
+                                        <div class="form-row">
+                                            <label class="col-form-label col-sm-2" >URL: </label><input class="form-control col-sm-10" type="text" id="url" name="url" value="" placeholder="https://bn.wikipedia.org/wiki/প্রধান_পাতা">
+                                        </div>    
+                                <?php }?>
+                                <div class="form-row">
+                                    <label class="col-form-label col-sm-2" >Search Maximum: </label><input class="form-control col-sm-10" type="text" id="top" name="top" value="10">
+                                </div>
                             </div>
 
                             <div>
-                            <?php
-                                if(isset($_SESSION)){?>
-                                    <?php
-                                    if(isset($_SESSION['user_type'])){?>
-                                        <button onclick="indexing()" type="button" class="btn btn-info">Document Index</button>
-                                    <?php } ?>
+                                <div style="display:none;" id="loading">
+                                    <div class="spinner-border text-info" role="status">
+                                        <span class="sr-only"></span>
+                                    </div>
+                                    <span>Loading...</span>
+                                </div>
+                            <?php 
+                                if($show){?>
+                                    <button id="url_button" onclick="url_indexing()" type="button" class="btn btn-info">Website Index</button>
+                                    <button id="index_button" onclick="indexing()" type="button" class="btn btn-info">Document Index</button>
                             <?php } ?>
-                                <button onclick="checking()" type="button" class="btn btn-info">Scan for plagarism</button>
+                                <button id="checking_button" onclick="checking()" type="button" class="btn btn-info">Scan for plagarism</button>
                             </div>
                         </form>
                     </div>
@@ -167,6 +194,9 @@
         function checking(){
             $("#datatable tbody").html("");
             $('#datatable').DataTable();
+
+            $("#checking_button").hide();
+            $("#loading").show();
             
             //alert("hi");
             var form = $('#file_form')[0];
@@ -203,6 +233,8 @@
                 datatype: "html",
                 enctype: 'multipart/form-data',
                 success: function(data){
+                    $("#checking_button").show();
+                    $("#loading").hide();
                     console.log(data);
                     datas = $.parseJSON(data);
                     //console.log(datas);
@@ -210,7 +242,7 @@
                     var name = "query";
                     var query = "";
                     var i = 0;
-                    var n = 2000000;
+                    var n = 20000000000000000000;
                     var dir = "<?=$PATH?>";
                     
                     $("#tbody").html("");
@@ -231,6 +263,7 @@
                             //console.log(value['id']);
                             //console.log(value['value']);
                             //console.log(value['percentage']);
+                            
                             name = value['value'];
 
                             name =  name.replace('"', ' ');
@@ -241,9 +274,22 @@
                             }
 
                             id = value['id'];
-                            get_file(id);
+                            search_type = value['type'];
+                            download_url_str = "";
+                            if(search_type=="file"){
+                                get_file(id);
 
-                            file_path = $("#file_path").val();
+                                file_path = $("#file_path").val();
+
+                                download_url_str='<a id="download_link_'+i+'" download href="'+file_path+'"><i style="color:#11a683" class="fa fa-download"> File</i></a>';
+                                
+                            }
+                            else{
+                                download_url_str='<a target="_blank" id="download_link_'+i+'" href="'+id+'"><i style="color:#11a683" class="fa fa-link"> File Link</i></a>';
+                            }
+
+                            
+                            
                             
                            
                             //console.log(file_path);
@@ -258,7 +304,7 @@
                             str+='<canvas id="myChart_'+i+'" width="200" height="50"></canvas>';
                             str+="</td>"
                             str+="<td>"+name+"</td>";
-                            str+='<td><a id="download_link_'+i+'" download href="'+file_path+'"><i style="color:#11a683" class="fa fa-download"> File</i></a></td>';
+                            str+= "<td>"+download_url_str+"</td>";
                             str+="</tr>";
 
                         }
@@ -291,6 +337,8 @@
         function indexing(){
             //console.log("hi");
             //alert("hi");
+            $("#index_button").hide();
+            $("#loading").show();
             
             var form = $('#file_form')[0];
 		    var data = new FormData(form);
@@ -324,11 +372,46 @@
                     console.log(data);
                     store_db(data, GUID);
                     alert("Successfully Indexed");
+                    $("#index_button").show();
+                    $("#loading").hide();
                 },
                 error: function(data) {
                     console.log(data);
                 }
             });
+        }
+
+        function url_indexing(){
+            var url_link = $("#url").val();
+            if(url_link!=""){
+                $("#url_button").hide();
+                $("#loading").show();
+                
+                data = new FormData();
+                data.append( 'url', url_link );
+                url = "wiki_scrape.php";
+                jQuery.ajax({
+                    type: "POST",
+                    url: url,
+                    data : data,
+                    cache: false,
+                    processData: false,
+                    contentType: false,
+                    datatype: "json",
+                    enctype: 'multipart/form-data',
+                    success: function(data){
+                        console.log(data);
+                        $("#loading").hide();
+                        $("#url_button").show();
+                        
+                    },
+                    error: function(data) {
+                        console.log(data);
+                    }
+                });
+
+                
+            }
         }
     </script>
     <script>

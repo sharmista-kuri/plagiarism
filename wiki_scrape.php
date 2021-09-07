@@ -1,11 +1,46 @@
 <?php
 
+function curlSendText($text = '', $url = '', $GUID="0", $type)
+{
+    if ($text == '' || $url == '')
+        return false;
+    $post_data = [];
+    $post_data["text"] = $text;
+    $post_data["type"] = $type;
+    $post_data["GUID"] = $GUID;
+    return postCurlJava($url, $post_data);
+}
+
+function postCurlJava($url, $data)
+{  
+    
+    $data = json_encode($data, JSON_UNESCAPED_UNICODE);    
+    $ch = curl_init($url);
+    $headers = array(
+
+        'Content-Type: application/json',
+        'Accept: application/json'
+    );
+    curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+    $output = curl_exec($ch);
+
+    curl_close($ch);
+    //echo $output;
+
+    return $output;
+}
+
 function crawl_page($url, $depth = 5)
 {
     static $seen = array();
+    $text = "";
+    
     if (isset($seen[$url]) || $depth === 0) {
         return;
-        echo 'END';
     }
 
     $seen[$url] = true;
@@ -26,9 +61,19 @@ function crawl_page($url, $depth = 5)
 	if($row->length > 0){
 		foreach($row as $row){
 			echo $row->nodeValue . "<br/>";
-            write($row->nodeValue);
+            $text.= $row->nodeValue;
 		}
 	}
+    
+    //write_url($url,$depth);
+    if($text!=""){
+        //$text = "URL:".$url."___##$$##!@#$%___".$text;
+        //write($text,$depth);
+
+        $url_java = "http://127.0.0.1:8081/api/example/store";
+        $res_java = curlSendText($text, $url_java, $url, "url");
+    }
+
     
 
     foreach ($anchors as $element) {
@@ -75,12 +120,20 @@ function crawl_page($url, $depth = 5)
     //echo "URL:",$url,PHP_EOL,"CONTENT:",PHP_EOL,$dom->saveHTML(),PHP_EOL,PHP_EOL;
 }
 
-$url = "https://bn.wikipedia.org/wiki/ঢাকা_বিশ্ববিদ্যালয়";
+//$url = "https://bn.wikipedia.org/wiki/ঢাকা_বিশ্ববিদ্যালয়";
+$url = $_POST['url'];
 crawl_page($url, 5);
 
+function write_url($url,$counter){
+    $myfile = fopen("scrape_file.txt", "a") or die("Unable to open file!");
+    fwrite($myfile, $counter);
+    fwrite($myfile, $url);
+    fclose($myfile);
+}
 
-
-function write($txt){
+function write($txt,$counter){
+    
+    //$myfile = fopen("scrape_file_".$counter.".txt", "w") or die("Unable to open file!");
     $myfile = fopen("scrape_file.txt", "a") or die("Unable to open file!");
     fwrite($myfile, $txt);
     fclose($myfile);

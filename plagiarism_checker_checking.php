@@ -139,6 +139,10 @@ elseif($File_Ext==".pdf")
 }
 $res = curlSendFile(new CURLFile($file_name), $url);
 
+$res = substr_replace($res ,"",-1);
+$res = rtrim($res, '"');
+$res = ltrim($res, '"');
+
 $url = "http://127.0.0.1:8081/api/example/search";
 $res_java = curlSendText($res, $url, $top);
 
@@ -156,7 +160,7 @@ $size = sizeof($query_explode);
 
 $query = str_replace('"','',$query);
 
-//  print_r($json);
+//print_r($json);
 
 $p_array = [];
 $name_array = [];
@@ -194,13 +198,14 @@ foreach($json as $key=>$value){
                 $query = $value1['query'];
                 $text = $value1['value'];
                 $id = $value1['id'];
+                $type = $value1['type'];
                 $matched_value = "";
 
-                $text = substr_replace($text ,"",-1);
+                /* $text = substr_replace($text ,"",-1);
                 $res = substr_replace($res ,"",-1);
 
                 $text = str_replace('"','',$text);
-                $res = str_replace('"','',$res);
+                $res = str_replace('"','',$res); */
 
                 /* echo 'res: '.$res; 
                 echo 'text: '.$text;  */
@@ -208,28 +213,38 @@ foreach($json as $key=>$value){
 
                 $text_explode = explode("।",$text);
 
-                $c=0;
+                $not_matched=0;
 
                 foreach($text_explode as $result){
 
                     $check = check_match($result,$res);
                     if($check!==""){
-                        $c++;
+                        $not_matched++;
+                        $matched_value.= $check."।";
                     }
+
+                    //else{
+                        
+                    //}
                     
-                    $matched_value.= $check."।";
+                    
                     
                     
                 }   
-                //echo 'matched: '.$c; 
                 
                 
-                if($matched_value!==""){
+                if($not_matched!==0){
+                    //echo 'matched: '.$c; 
+                    //echo 'size: '.$size; 
+                    $size = $size-1;
                     
-                    $percentage = 100-(($size-$c)*100)/$size;
+                    $percentage = 100-(($size-$not_matched)*100)/$size;
                     $percentage = number_format((float)$percentage, 2, '.', ''); 
                     //echo 'matched: '.$left;  
-                    $myArray[] = array("id" => $id,"value" => $matched_value, "percentage" => $percentage);
+
+                    $matched_value = rtrim($matched_value, '।');
+
+                    $myArray[] = array("id" => $id,"type" => $type,"value" => $matched_value, "percentage" => $percentage);
                 }
                 
 
