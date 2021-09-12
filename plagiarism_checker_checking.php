@@ -156,7 +156,7 @@ $arr = json_decode($res_java, true);
 $json = json_decode($res_java, true);
 
 $query_explode = explode("।",$query);
-$size = sizeof($query_explode);
+$sizes = sizeof($query_explode);
 
 $query = str_replace('"','',$query);
 
@@ -193,6 +193,7 @@ foreach($json as $key=>$value){
                 
                 //print_r($value1['score']);
                 //echo '</br>';
+              
 
                 $score = $value1['score'];
                 $query = $value1['query'];
@@ -236,7 +237,9 @@ foreach($json as $key=>$value){
                 if($not_matched!==0){
                     //echo 'matched: '.$c; 
                     //echo 'size: '.$size; 
-                    $size = $size-1;
+                    $size = $sizes-1;
+                    //echo $not_matched;
+                    //echo $size;
                     
                     $percentage = 100-(($size-$not_matched)*100)/$size;
                     $percentage = number_format((float)$percentage, 2, '.', ''); 
@@ -263,6 +266,29 @@ function check_match($result,$query){
     foreach($query_explode as $query){
         if (strcmp($query, $result) !== 0) {
             //$matched_value.=$result;
+            $result_explode = explode("\n",$result);
+            foreach($result_explode as $result){
+                if (strcmp($query, $result) !== 0) 
+                {
+                    $result_explode = explode("\t",$result);
+                    foreach($result_explode as $result){
+                        if (strcmp($query, $result) !== 0) 
+                        {
+                            
+                        }
+                        else {
+                            $matched_value.=$result;
+                
+                        }
+                    }
+                }
+                else {
+                    $matched_value.=$result;
+        
+                }
+            }
+
+
         }
         else {
             $matched_value.=$result;
