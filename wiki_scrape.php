@@ -34,7 +34,7 @@ function postCurlJava($url, $data)
     return $output;
 }
 
-function crawl_page($url, $depth = 5)
+function crawl_page($url, $depth = 1)
 {
     static $seen = array();
     $text = "";
@@ -69,6 +69,11 @@ function crawl_page($url, $depth = 5)
     if($text!=""){
         //$text = "URL:".$url."___##$$##!@#$%___".$text;
         //write($text,$depth);
+        $text = str_replace("\n","",$text);
+        $text = str_replace("\t","",$text);
+        $text = str_replace('"',"",$text);
+        $text = str_replace("\\","",$text);
+        $text = str_replace("অনিবন্ধিত সম্পাদকের জন্য পাতা আরও জানুন","",$text);
 
         $url_java = "http://127.0.0.1:8081/api/example/store";
         $res_java = curlSendText($text, $url_java, $url, "url");
@@ -122,7 +127,7 @@ function crawl_page($url, $depth = 5)
 
 //$url = "https://bn.wikipedia.org/wiki/ঢাকা_বিশ্ববিদ্যালয়";
 $url = $_POST['url'];
-crawl_page($url, 5);
+crawl_page($url, 1);
 
 function write_url($url,$counter){
     $myfile = fopen("scrape_file.txt", "a") or die("Unable to open file!");
