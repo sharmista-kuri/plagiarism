@@ -143,7 +143,7 @@ $res = substr_replace($res ,"",-1);
 $res = rtrim($res, '"');
 $res = ltrim($res, '"');
 
-$url = "http://127.0.0.1:8081/api/example/search";
+$url = "http://127.0.0.1:8082/api/example/search";
 $res_java = curlSendText($res, $url, $top);
 
 
@@ -214,13 +214,13 @@ foreach($json as $key=>$value){
 
                 $text_explode = explode("।",$text);
 
-                $not_matched=0;
+                $matched=0;
 
                 foreach($text_explode as $result){
 
                     $check = check_match($result,$res);
                     if($check!==""){
-                        $not_matched++;
+                        $matched++;
                         $matched_value.= $check."।";
                     }
 
@@ -234,14 +234,14 @@ foreach($json as $key=>$value){
                 }   
                 
                 
-                if($not_matched!==0){
+                if($matched!==0){
                     //echo 'matched: '.$c; 
                     //echo 'size: '.$size; 
                     $size = $sizes-1;
-                    //echo $not_matched;
+                    //echo $matched;
                     //echo $size;
                     
-                    $percentage = 100-(($size-$not_matched)*100)/$size;
+                    $percentage = 100-(($size-$matched)*100)/$size;
                     $percentage = number_format((float)$percentage, 2, '.', ''); 
                     //echo 'matched: '.$left;  
 
@@ -259,8 +259,18 @@ foreach($json as $key=>$value){
     }
 }
 
-
 function check_match($result,$query){
+    $matched_value = "";
+    if($result!=""){
+        if (strpos($query, $result) !== false) {
+            $matched_value.=$result;
+        }
+    }
+    
+    return $matched_value;
+}
+
+/* function check_match($result,$query){
     $matched_value = "";
     $query_explode = explode("।",$query);
     foreach($query_explode as $query){
@@ -297,7 +307,7 @@ function check_match($result,$query){
     }
     
     return $matched_value;
-} 
+} */ 
 
 //print_r($myArray);
 
