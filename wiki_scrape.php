@@ -34,7 +34,7 @@ function postCurlJava($url, $data)
     return $output;
 }
 
-function crawl_page($url, $depth = 1)
+function crawl_page($url, $depth = 5)
 {
     static $seen = array();
     $text = "";
@@ -127,7 +127,7 @@ function crawl_page($url, $depth = 1)
 
 //$url = "https://bn.wikipedia.org/wiki/ঢাকা_বিশ্ববিদ্যালয়";
 $url = $_POST['url'];
-crawl_page($url, 1);
+crawl_page($url, 5);
 
 function write_url($url,$counter){
     $myfile = fopen("scrape_file.txt", "a") or die("Unable to open file!");
