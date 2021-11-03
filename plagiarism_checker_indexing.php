@@ -127,7 +127,7 @@ $res = rtrim($res, '"');
 $res = ltrim($res, '"');
 //echo $res;exit;
 $type = "file";
-$url = "http://127.0.0.1:8081/api/example/store";
+$url = "http://127.0.0.1:8082/api/example/store";
 $res_java = curlSendText($res, $url, $GUID);
  
 echo $NewFileNameEnq;

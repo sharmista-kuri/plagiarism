@@ -75,7 +75,7 @@ function crawl_page($url, $depth = 1)
         $text = str_replace("\\","",$text);
         $text = str_replace("অনিবন্ধিত সম্পাদকের জন্য পাতা আরও জানুন","",$text);
 
-        $url_java = "http://127.0.0.1:8081/api/example/store";
+        $url_java = "http://127.0.0.1:8082/api/example/store";
         $res_java = curlSendText($text, $url_java, $url, "url");
     }
 

@@ -276,15 +276,30 @@
                             id = value['id'];
                             search_type = value['type'];
                             download_url_str = "";
+                            
                             if(search_type=="file"){
                                 get_file(id);
 
                                 file_path = $("#file_path").val();
+                                
+                                
+                                
+                                
 
                                 download_url_str='<a id="download_link_'+i+'" download href="'+file_path+'"><i style="color:#11a683" class="fa fa-download"> File</i></a>';
                                 
                             }
                             else{
+
+                                check = id.search('xampp');
+                                
+                                if(check!=-1){
+                                    link_path_split = id.split('\\');
+                                    //console.log(link_path_split);
+                                    link_path = link_path_split[link_path_split.length - 1];
+                                    link_code= link_path.replace(".html", "");
+                                    id= "https://bn.wikipedia.org/wiki/"+link_code;
+                                }
                                 download_url_str='<a target="_blank" id="download_link_'+i+'" href="'+id+'"><i style="color:#11a683" class="fa fa-link"> File Link</i></a>';
                             }
 
