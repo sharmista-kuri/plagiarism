@@ -146,7 +146,7 @@ $res = ltrim($res, '"');
 $url = "http://127.0.0.1:8082/api/example/search";
 $res_java = curlSendText($res, $url, $top);
 
-
+//print_r($res);
 
 $query = $res;
 $arr = json_decode($res_java, true);
@@ -161,6 +161,7 @@ $sizes = sizeof($query_explode);
 $query = str_replace('"','',$query);
 
 //print_r($json);
+//print_r($sizes);
 
 $p_array = [];
 $name_array = [];
@@ -171,7 +172,8 @@ $myArray[] = array("query"=>$query);
 $percentage = 0;
 $flag=0;
 $counter = 0;
-
+$matched=0;
+$not_matched=0;
 
 
 
@@ -185,7 +187,7 @@ foreach($json as $key=>$value){
         }
     }
 }
-foreach($json as $key=>$value){
+/* foreach($json as $key=>$value){
     if($flag){ 
         if($key!="counter"){
             //echo'<pre>';print_r($key);
@@ -202,14 +204,14 @@ foreach($json as $key=>$value){
                 $type = $value1['type'];
                 $matched_value = "";
 
-                /* $text = substr_replace($text ,"",-1);
-                $res = substr_replace($res ,"",-1);
+                // $text = substr_replace($text ,"",-1);
+                // $res = substr_replace($res ,"",-1);
 
-                $text = str_replace('"','',$text);
-                $res = str_replace('"','',$res); */
+                // $text = str_replace('"','',$text);
+                // $res = str_replace('"','',$res);
 
-                /* echo 'res: '.$res; 
-                echo 'text: '.$text;  */
+                // echo 'res: '.$res; 
+                // echo 'text: '.$text;  
 
 
                 $text_explode = explode("।",$text);
@@ -257,13 +259,95 @@ foreach($json as $key=>$value){
         }
         
     }
+} */
+
+//print_r($json);
+
+foreach($json as $key=>$value){
+    if($flag){ 
+        if($key!="counter"){
+            //print_r($value);
+            foreach ($value as $key2 => $value2) {
+                foreach ($value2 as $key1 => $value1) {
+                    //print_r($value1['id']);
+                    $score = $value1['score'];
+                    $query = $value1['query'];
+                    $text = $value1['value'];
+                    $id = $value1['id'];
+                    $type = $value1['type'];
+
+                    //$match_file[$id][] = $query;
+
+                    //$matched_value="";
+
+                    //print_r($query);
+                    //print_r($text);
+                    $check = check_match($text,$query);
+                    //print_r("\n");
+                    //print_r($check);
+
+                    if($check!==""){
+                        $matched++;
+                        //$matched_value.= $check."।";
+                        $match_file[$id]["type"]=$type;
+                        $match_file[$id][] = $check."।";
+                        
+                    }
+                    else{
+                        $not_match_file[$id][] = $query."।";
+                        $not_matched++;
+                    }
+                }
+            }
+        }
+    }
+
+}
+
+//print_r($match_file);
+
+/* foreach($match_file as  $key=>$value){
+    foreach ($value as $key1 => $value1) {
+        if($key!="type"){
+            $type= $value1;
+        }
+        else{
+            $matched_value.= $value1;
+        }
+    }
+} */
+$size = $sizes-1;
+$percentage = 100-(($size-$matched)*100)/$size;
+$percentage = number_format((float)$percentage, 2, '.', '');
+$type="url";
+foreach($match_file as  $key=>$value){
+    $matched_value="";
+    $id = $key;
+    //print_r($value['type']);
+    $type = $value['type'];
+    if($key!="type"){
+        foreach ($value as $key1 => $value1) {
+            print_r($value1);
+            //if($key1!="type"){
+                //$matched_value.= $value1;
+                //print_r($key1);
+            //}
+            
+        }
+    }
+    $myArray[] = array("id" => $id,"type" => $type,"value" => $matched_value, "percentage" => $percentage);
+    //print_r($key);
+    //print_r($value);
+    //print_r($matched_value);
 }
 
 function check_match($result,$query){
     $matched_value = "";
+    //print_r($result);
+    //exit;
     if($result!=""){
-        if (strpos($query, $result) !== false) {
-            $matched_value.=$result;
+        if (strpos($result, $query) !== false) {
+            $matched_value.=$query;
         }
     }
     

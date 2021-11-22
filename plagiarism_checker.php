@@ -142,6 +142,15 @@
                 </div>
             </div>
         </div>
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-12 text-center">
+                    <div class="shadow p-3 mb-5 bg-white rounded">
+                        <span id="query_txt"></spna>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <div class="container">
             <div class="row justify-content-center">
@@ -257,6 +266,8 @@
                                 query = query.substring(0,n);
                                 query = query+".....";
                             }
+                            $("#query_txt").text(query);
+
                         }
                         else{
                             i++;
