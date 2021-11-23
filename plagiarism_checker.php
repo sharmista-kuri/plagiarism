@@ -159,9 +159,9 @@
                         <table id="datatable" class="table table-bordered">
                             <thead>
                                 <th>SL</th>
-                                <th>Search</th>
-                                <th>Percentage</th>
-                                <th>Matched Document</th>
+                                <th width="50%">Search</th>
+                                <th width="1%">Percentage</th>
+                                <th width="40%">Matched Document</th>
                                 <th>Download</th>
                             </thead>
                             <tbody id="tbody">
@@ -201,8 +201,10 @@
         }
 
         function checking(){
-            $("#datatable tbody").html("");
-            $('#datatable').DataTable();
+            // $("#datatable tbody").html("");
+            // $('#datatable').DataTable();
+
+            $('#datatable').DataTable().clear().destroy();
 
             $("#checking_button").hide();
             $("#loading").show();
@@ -266,7 +268,7 @@
                                 query = query.substring(0,n);
                                 query = query+".....";
                             }
-                            $("#query_txt").text(query);
+                            //$("#query_txt").text(query);
 
                         }
                         else{
@@ -476,7 +478,8 @@
                         legend:{
                             display: true,
                             position : 'bottom',
-                            boxWidth : 10
+                            boxWidth : 10,
+                            itemWidth: 200,
                         }
                     }
                 }

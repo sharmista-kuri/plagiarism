@@ -291,9 +291,11 @@ foreach($json as $key=>$value){
                         //$matched_value.= $check."।";
                         $match_file[$id]["type"]=$type;
                         $match_file[$id][] = $check."।";
+                        //break;
                         
                     }
                     else{
+                        //print_r($query);
                         $not_match_file[$id][] = $query."।";
                         $not_matched++;
                     }
@@ -305,34 +307,25 @@ foreach($json as $key=>$value){
 }
 
 //print_r($match_file);
+//print_r($size);
+//print_r($not_match_file);
 
-/* foreach($match_file as  $key=>$value){
-    foreach ($value as $key1 => $value1) {
-        if($key!="type"){
-            $type= $value1;
-        }
-        else{
-            $matched_value.= $value1;
-        }
-    }
-} */
+
 $size = $sizes-1;
 $percentage = 100-(($size-$matched)*100)/$size;
 $percentage = number_format((float)$percentage, 2, '.', '');
 $type="url";
+//print_r($match_file);
 foreach($match_file as  $key=>$value){
     $matched_value="";
     $id = $key;
     //print_r($value['type']);
     $type = $value['type'];
-    if($key!="type"){
-        foreach ($value as $key1 => $value1) {
-            print_r($value1);
-            //if($key1!="type"){
-                //$matched_value.= $value1;
-                //print_r($key1);
-            //}
-            
+    
+    foreach ($value as $key1 => $value1) {
+        if($key1!="type"){
+            $matched_value.= $value1;
+            //print_r($key1);
         }
     }
     $myArray[] = array("id" => $id,"type" => $type,"value" => $matched_value, "percentage" => $percentage);
@@ -343,11 +336,18 @@ foreach($match_file as  $key=>$value){
 
 function check_match($result,$query){
     $matched_value = "";
-    //print_r($result);
+    //print_r($query);
+    //print_r("\n");
     //exit;
     if($result!=""){
         if (strpos($result, $query) !== false) {
             $matched_value.=$query;
+        }
+        else{
+            /* print_r("res:".$result);
+            print_r("qu:".$query);
+            $pos = strpos($result, $query);
+            print_r("pos: ".$pos); */
         }
     }
     
