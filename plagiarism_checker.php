@@ -253,7 +253,7 @@
                     var name = "query";
                     var query = "";
                     var i = 0;
-                    var n = 20000000000000000000;
+                    var n = 2000;
                     var dir = "<?=$PATH?>";
                     
                     $("#tbody").html("");
