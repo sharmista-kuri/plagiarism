@@ -1,5 +1,5 @@
 <?php
- 
+ ini_set('memory_limit', '-1');
 /**
  * htppCurl form upload file
 * @param $src
@@ -262,7 +262,7 @@ foreach($json as $key=>$value){
 } */
 
 //print_r($json);
-
+$match_file=array();
 foreach($json as $key=>$value){
     if($flag){ 
         if($key!="counter"){
@@ -312,6 +312,11 @@ foreach($json as $key=>$value){
 
 
 $size = $sizes-1;
+if($matched>$size){
+    if($matched-$size==1){
+        $matched =$matched-1;
+    }
+}
 $percentage = 100-(($size-$matched)*100)/$size;
 $percentage = number_format((float)$percentage, 2, '.', '');
 $type="url";

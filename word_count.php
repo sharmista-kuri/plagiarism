@@ -22,17 +22,16 @@
         return $output;
     }
     $txt = "";
-    for($i=1;$i<1001;$i++){
+    for($i=1;$i<1005;$i++){
         
         $NewFileNameEnq = "query_".$i.".docx";
-        $UploadDirectory = $_SERVER['DOCUMENT_ROOT'] ."/plagiarism/query_doc/";
+        $UploadDirectory = $_SERVER['DOCUMENT_ROOT'] ."/web_crawler/query_doc/";
         $file_name = $UploadDirectory.$NewFileNameEnq;
         $url = "http://127.0.0.1:5000/api/parsing/doc";
         $res = curlSendFile(new CURLFile($file_name), $url);
 
         $query_explode = explode("।",$res);
         $sizes = sizeof($query_explode);
-        $sizes = $sizes-1;
 
         //$txt.= $NewFileNameEnq." lines: ".$sizes."\n";
         //echo $i."<br>";
@@ -44,7 +43,7 @@
     write($txt);
 
     function write($txt){
-        $myfile = fopen("orginal_lines.txt", "w") or die("Unable to open file!");
+        $myfile = fopen("word_count.txt", "w") or die("Unable to open file!");
         fwrite($myfile, $txt);
         fclose($myfile);
     }
