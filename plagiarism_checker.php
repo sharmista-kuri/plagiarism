@@ -253,7 +253,7 @@
                     var name = "query";
                     var query = "";
                     var i = 0;
-                    var n = 2000;
+                    var n = 200;
                     var dir = "<?=$PATH?>";
                     
                     $("#tbody").html("");
@@ -264,11 +264,12 @@
                         if(name in value){
                             query = value['query'];
                             query =  query.replace('"', ' ');
+                            $("#query_txt").text(query);
                             if(query.length > n) {
                                 query = query.substring(0,n);
                                 query = query+".....";
                             }
-                            //$("#query_txt").text(query);
+                            
 
                         }
                         else{
