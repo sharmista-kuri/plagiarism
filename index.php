@@ -1,6 +1,7 @@
 <?php session_start();?>
 <?php
-    $PATH = "http://localhost/plagiarism/document_file/";
+    include "config.php";
+    $PATH = $UploadDirectory;
 ?>
 <?php
     $show=0;
@@ -188,7 +189,7 @@
                 instantUpload: false,
                 allowProcess: false,
                 allowFileTypeValidation: true,
-                acceptedFileTypes: ['.pdf','application/pdf','.doc','.docx','application/msword','application/vnd.openxmlformats-officedocument.wordprocessingml.document'],
+                acceptedFileTypes: ['.doc','.docx','application/msword','application/vnd.openxmlformats-officedocument.wordprocessingml.document'],
 
                 
                 fileValidateTypeDetectType: (source, type) =>
@@ -218,7 +219,7 @@
 		    var data = new FormData(form);
             //console.log($( '#file_upload' ).files);
             //console.log(form);
-
+            //console.log(pond.FileStatus);
             pondFiles = pond.getFiles();
  
             //console.log(pondFiles[0].file);
