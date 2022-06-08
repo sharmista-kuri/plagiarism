@@ -13,10 +13,10 @@ class Send_Mail {
       $mail->SMTPAuth = true;
       $mail->Host = 'smtp.gmail.com';
       $mail->Port = 587;
-      $mail->Username = 'skuri.cse@gmail.com';
-      $mail->Password = 'S@umitra@123#';
-      $mail->setFrom('skuri.cse@gmail.com');
-      $mail->FromName = "skuri.cse@gmail.com";
+      $mail->Username = 'co_letter@du.ac.bd';
+      $mail->Password = '###sabbir01922###';
+      $mail->setFrom('co_letter@du.ac.bd');
+      $mail->FromName = "co_letter@du.ac.bd";
       $mail->addAddress($email);
       $mail->Subject = $subject;
       $mail->msgHTML($str);

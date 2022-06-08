@@ -37,7 +37,6 @@
 			  send_fn($username,$email,$code);
         $_SESSION['msg_reg']="Please Verify Your Email";
 			  echo("<script>location.href = 'register.php';</script>");
-			//echo("<script>location.href = 'index.php';</script>");
 		} else{
 			
 			$_SESSION['msg_reg']="Not Registered";
@@ -691,7 +690,7 @@
                         <span class="txt1">
                             Already Registered?
 						</span>
-						<a class="txt2" href="index.php">
+						<a class="txt2" href="login_page.php">
 							Login
 							<i class="fa fa-long-arrow-right m-l-5" aria-hidden="true"></i>
 						</a>

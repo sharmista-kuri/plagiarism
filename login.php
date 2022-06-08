@@ -45,7 +45,7 @@
             $_SESSION['msg']="Wrong email/ password";
         }
  
-        echo("<script>location.href = 'index.php';</script>");
+        echo("<script>location.href = 'login_page.php';</script>");
 
     }
 

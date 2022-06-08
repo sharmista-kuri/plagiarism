@@ -1,38 +1,6 @@
 <?php
-
-function curlSendText($text = '', $url = '', $GUID="0", $type)
-{
-    if ($text == '' || $url == '')
-        return false;
-    $post_data = [];
-    $post_data["text"] = $text;
-    $post_data["type"] = $type;
-    $post_data["GUID"] = $GUID;
-    return postCurlJava($url, $post_data);
-}
-
-function postCurlJava($url, $data)
-{  
-    
-    $data = json_encode($data, JSON_UNESCAPED_UNICODE);    
-    $ch = curl_init($url);
-    $headers = array(
-
-        'Content-Type: application/json',
-        'Accept: application/json'
-    );
-    curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-    curl_setopt($ch, CURLOPT_POST, true);
-    curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-
-    $output = curl_exec($ch);
-
-    curl_close($ch);
-    //echo $output;
-
-    return $output;
-}
+include "config.php";
+include "curl.php";
 
 function crawl_page($url, $depth = 5)
 {
@@ -75,8 +43,8 @@ function crawl_page($url, $depth = 5)
         $text = str_replace("\\","",$text);
         $text = str_replace("অনিবন্ধিত সম্পাদকের জন্য পাতা আরও জানুন","",$text);
 
-        $url_java = "http://127.0.0.1:8082/api/example/store";
-        $res_java = curlSendText($text, $url_java, $url, "url");
+        $url_java = JAVA_STORE_URL;
+        $res_java = curlSendTextIndexing($text, $url_java, $url, "url");
     }
 
     

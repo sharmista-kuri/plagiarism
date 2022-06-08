@@ -1,7 +1,5 @@
 <?php session_start();?>
-<?php
-    $PATH = "http://localhost/plagiarism/document_file/";
-?>
+
 <html>
     <head>
         <title>Plagiarism</title>

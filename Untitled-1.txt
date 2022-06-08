@@ -1,4 +1,0 @@
-
-Warning: session_start(): Cannot send session cookie - headers already sent by (output started at /home/letterd/public_html/base_url.php:1) in /home/letterd/public_html/staffLogin.php on line 107
-
-Warning: session_start(): Cannot send session cache limiter - headers already sent (output started at /home/letterd/public_html/base_url.php:1) in

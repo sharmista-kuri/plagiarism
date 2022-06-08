@@ -30,7 +30,6 @@
         }
 
         $_SESSION['msg']=$msg_reg;
-        //echo("<script>location.href = 'index.php';</script>");
     }
 
 ?>

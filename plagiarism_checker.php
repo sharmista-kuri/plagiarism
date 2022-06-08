@@ -1,6 +1,7 @@
 <?php session_start();?>
 <?php
-    $PATH = "http://localhost/plagiarism/document_file/";
+    include "config.php";
+    $PATH = $UploadDirectory;
 ?>
 <?php
     $show=0;
@@ -81,9 +82,13 @@
                         
                     </ul>
                 
-                    
-                    <a class="btn btn-outline-info my-2 my-sm-0" href="logout.php">Logout</a>
-                    
+                    <?php if($show){?>
+                        <a class="btn btn-outline-info my-2 my-sm-0" href="logout.php">Logout</a>
+                    <?php } 
+                        else{
+                    ?>
+                        <a class="btn btn-outline-info my-2 my-sm-0" href="login_page.php">Log In</a>
+                    <?php } ?>
                 </div>
             </nav>
         </div>
@@ -184,7 +189,7 @@
                 instantUpload: false,
                 allowProcess: false,
                 allowFileTypeValidation: true,
-                acceptedFileTypes: ['.pdf','application/pdf','.doc','.docx','application/msword','application/vnd.openxmlformats-officedocument.wordprocessingml.document'],
+                acceptedFileTypes: ['.doc','.docx','application/msword','application/vnd.openxmlformats-officedocument.wordprocessingml.document'],
 
                 
                 fileValidateTypeDetectType: (source, type) =>

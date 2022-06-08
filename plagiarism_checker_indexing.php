@@ -1,79 +1,7 @@
 <?php
- 
-/**
- * htppCurl form upload file
-* @param $src
-* @param string $urlRoute
-* @return bool|mixed
-*/
-function curlSendFile(CURLFile $file, $url = '', $key = "123456")
-{
-    if ($file == null || $url == '')
-        return false;
-    $post_data = [];
-    $post_data["file"] = $file;
-    $post_data["key"] = $key;
-    return postCurl($url, $post_data);
-}
+ include "config.php";
+ include "curl.php";
 
-function curlSendText($text = '', $url = '', $GUID="0",$type = "file")
-{
-    if ($text == '' || $url == '')
-        return false;
-    $post_data = [];
-    $post_data["text"] = $text;
-    $post_data["type"] = $type;
-    $post_data["GUID"] = $GUID;
-    return postCurlJava($url, $post_data);
-}
-
-  
- /**
-    * CurlPost request
-  * @param $url
-  * @param $data
-  * @return mixed
-  * @author Bill
-  */
-function postCurl($url, $data)
-{
-    $ch = curl_init();
-    curl_setopt($ch, CURLOPT_URL, $url);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-    curl_setopt($ch, CURLOPT_POST, 1);
-    curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
-    $output = curl_exec($ch);
-    curl_close($ch);
-    //echo $output;
-    return $output;
-}
-
-function postCurlJava($url, $data)
-{  
-    
-    $data = json_encode($data, JSON_UNESCAPED_UNICODE);    
-    $ch = curl_init($url);
-    $headers = array(
-
-        'Content-Type: application/json',
-        'Accept: application/json'
-    );
-    curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-    curl_setopt($ch, CURLOPT_POST, true);
-    curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-
-    $output = curl_exec($ch);
-
-    curl_close($ch);
-    //echo $output;
-
-    return $output;
-}
-
- 
-
-$UploadDirectory = $_SERVER['DOCUMENT_ROOT'] ."/plagiarism/document_file/";
 $File_Ext = "";
 $NewFileNameEnq = "";
 //print_r($_FILES);
@@ -101,12 +29,7 @@ $file_name = $UploadDirectory.$NewFileNameEnq;
 $url = "";
 if($File_Ext==".doc"||$File_Ext==".docx")
 {
-    $url = "http://127.0.0.1:5000/api/parsing/doc";
-    $res = curlSendFile(new CURLFile($file_name), $url);
-}
-elseif($File_Ext==".pdf")
-{
-    $url = "http://127.0.0.1:5000/api/parsing/pdf";
+    $url = PYTHON_URL;
     $res = curlSendFile(new CURLFile($file_name), $url);
 }
 
@@ -127,8 +50,8 @@ $res = rtrim($res, '"');
 $res = ltrim($res, '"');
 //echo $res;exit;
 $type = "file";
-$url = "http://127.0.0.1:8082/api/example/store";
-$res_java = curlSendText($res, $url, $GUID);
+$url = JAVA_STORE_URL;
+$res_java = curlSendTextIndexing($res, $url, $GUID, "file");
  
 echo $NewFileNameEnq;
 

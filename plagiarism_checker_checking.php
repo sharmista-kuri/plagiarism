@@ -1,106 +1,7 @@
 <?php
- ini_set('memory_limit', '-1');
-/**
- * htppCurl form upload file
-* @param $src
-* @param string $urlRoute
-* @return bool|mixed
-*/
-function curlSendFile(CURLFile $file, $url = '', $key = "123456")
-{
-    if ($file == null || $url == '')
-        return false;
-    $post_data = [];
-    $post_data["file"] = $file;
-    $post_data["key"] = $key;
-    return postCurl($url, $post_data);
-}
+include "config.php";
+include "curl.php";
 
-function curlSendText($text = '', $url = '', $top=10)
-{
-    if ($text == '' || $url == '')
-        return false;
-    $post_data = [];
-    $post_data["text"] = $text;
-    $post_data["top"] = $top;
-    return postCurlJava($url, $post_data);
-}
-
-function curlCompare($text = '',$query = '', $url = '')
-{
-    if ($text == '' || $url == '')
-        return false;
-    $post_data = [];
-    $post_data["text"] = $text;
-    $post_data["query"] = $query;
-    return postCurlCompare($url, $post_data);
-}
-  
- /**
-    * CurlPost request
-  * @param $url
-  * @param $data
-  * @return mixed
-  * @author Bill
-  */
-function postCurl($url, $data)
-{
-    $ch = curl_init();
-    curl_setopt($ch, CURLOPT_URL, $url);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-    curl_setopt($ch, CURLOPT_POST, 1);
-    curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
-    $output = curl_exec($ch);
-    curl_close($ch);
-    //echo $output;
-    return $output;
-}
-
-function postCurlJava($url, $data)
-{  
-    
-    $data = json_encode($data, JSON_UNESCAPED_UNICODE);    
-    $ch = curl_init($url);
-    $headers = array(
-
-        'Content-Type: application/json',
-        'Accept: application/json'
-    );
-    curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-    curl_setopt($ch, CURLOPT_POST, true);
-    curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-
-    $output = curl_exec($ch);
-
-    curl_close($ch);
-    //echo $output;
-
-    return $output;
-}
-
-function postCurlCompare($url, $data)
-{
-    $data = json_encode($data, JSON_UNESCAPED_UNICODE); 
-    $ch = curl_init();
-    $headers = array(
-
-        'Content-Type: application/json',
-        'Accept: application/json'
-    );
-    curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-    curl_setopt($ch, CURLOPT_URL, $url);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-    curl_setopt($ch, CURLOPT_POST, 1);
-    curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
-    $output = curl_exec($ch);
-    curl_close($ch);
-    //echo $output;
-    return $output;
-}
-  
-
-$UploadDirectory = $_SERVER['DOCUMENT_ROOT'] ."/plagiarism/document_file/";
 $File_Ext = "";
 $NewFileNameEnq = "";
 
@@ -131,26 +32,22 @@ $url = "";
 $res = "";
 if($File_Ext==".doc"||$File_Ext==".docx")
 {
-    $url = "http://127.0.0.1:5000/api/parsing/doc";
+    $url = PYTHON_URL;
 }
-elseif($File_Ext==".pdf")
-{
-    $url = "http://127.0.0.1:5000/api/parsing/pdf";
-}
+
 $res = curlSendFile(new CURLFile($file_name), $url);
 
 $res = substr_replace($res ,"",-1);
 $res = rtrim($res, '"');
 $res = ltrim($res, '"');
 
-$url = "http://127.0.0.1:8082/api/example/search";
+$url = JAVA_SEARCH_URL;
 $res_java = curlSendText($res, $url, $top);
 
 //print_r($res);
 
 $query = $res;
 $arr = json_decode($res_java, true);
-
 
 
 $json = json_decode($res_java, true);
@@ -176,139 +73,116 @@ $matched=0;
 $not_matched=0;
 
 
-
-foreach($json as $key=>$value){
-    //echo $key;
-    //print_r ($value);
-    if($key=="counter"){
-        if($value!="0"){
-            $flag=1;
-            $counter = $value;
+if (is_array($json) || is_object($json))
+{
+    foreach($json as $key=>$value){
+        //echo $key;
+        //print_r ($value);
+        if($key=="counter"){
+            if($value!="0"){
+                $flag=1;
+                $counter = $value;
+            }
         }
     }
 }
-/* foreach($json as $key=>$value){
-    if($flag){ 
-        if($key!="counter"){
-            //echo'<pre>';print_r($key);
-            foreach ($value as $key1 => $value1) {
-                
-                //print_r($value1['score']);
-                //echo '</br>';
-              
-
-                $score = $value1['score'];
-                $query = $value1['query'];
-                $text = $value1['value'];
-                $id = $value1['id'];
-                $type = $value1['type'];
-                $matched_value = "";
-
-                // $text = substr_replace($text ,"",-1);
-                // $res = substr_replace($res ,"",-1);
-
-                // $text = str_replace('"','',$text);
-                // $res = str_replace('"','',$res);
-
-                // echo 'res: '.$res; 
-                // echo 'text: '.$text;  
-
-
-                $text_explode = explode("।",$text);
-
-                $matched=0;
-
-                foreach($text_explode as $result){
-
-                    $check = check_match($result,$res);
-                    if($check!==""){
-                        $matched++;
-                        $matched_value.= $check."।";
-                    }
-
-                    //else{
-                        
-                    //}
-                    
-                    
-                    
-                    
-                }   
-                
-                
-                if($matched!==0){
-                    //echo 'matched: '.$c; 
-                    //echo 'size: '.$size; 
-                    $size = $sizes-1;
-                    //echo $matched;
-                    //echo $size;
-                    
-                    $percentage = 100-(($size-$matched)*100)/$size;
-                    $percentage = number_format((float)$percentage, 2, '.', ''); 
-                    //echo 'matched: '.$left;  
-
-                    $matched_value = rtrim($matched_value, '।');
-
-                    $myArray[] = array("id" => $id,"type" => $type,"value" => $matched_value, "percentage" => $percentage);
-                }
-                
-
-
-                
-            }
-        }
-        
-    }
-} */
 
 //print_r($json);
 $match_file=array();
-foreach($json as $key=>$value){
-    if($flag){ 
-        if($key!="counter"){
-            //print_r($value);
-            foreach ($value as $key2 => $value2) {
-                foreach ($value2 as $key1 => $value1) {
-                    //print_r($value1['id']);
-                    $score = $value1['score'];
-                    $query = $value1['query'];
-                    $text = $value1['value'];
-                    $id = $value1['id'];
-                    $type = $value1['type'];
+if (is_array($json) || is_object($json))
+{
+    foreach($json as $key=>$value){
+        if($flag){ 
+            if($key!="counter"){
+                //print_r($value);
+                foreach ($value as $key2 => $value2) {
+                    foreach ($value2 as $key1 => $value1) {
+                        //print_r($value1['id']);
+                        $score = $value1['score'];
+                        $query = $value1['query'];
+                        $text = $value1['value'];
+                        $id = $value1['id'];
+                        $type = $value1['type'];
 
-                    //$match_file[$id][] = $query;
+                        //$match_file[$id][] = $query;
 
-                    //$matched_value="";
+                        //$matched_value="";
 
-                    //print_r($query);
-                    //print_r($text);
-                    $check = check_match($text,$query);
-                    //print_r("\n");
-                    //print_r($check);
-
-                    if($check!==""){
-                        $matched++;
-                        //$matched_value.= $check."।";
-                        $match_file[$id]["type"]=$type;
-                        $match_file[$id][] = $check."।";
-                        //break;
-                        
-                    }
-                    else{
                         //print_r($query);
-                        $not_match_file[$id][] = $query."।";
-                        $not_matched++;
+                        //print_r($text);
+                        //$check = check_match($text,$query);
+
+
+                        
+                        $query_array = get_list_of_words($query);
+                        
+                        $k=0;
+                        
+
+                        $num_of_words = sizeof($query_array) - 1;
+
+                        //print_r("line: ".($num_of_words)."\n");
+                    
+                        for($i = 0; $i < $num_of_words; $i++){
+                            $k=$i;
+                            if($k%WORD_COUNT==0){
+                                $words_sen="";
+                                for($j = 0; $j < WORD_COUNT; $j++){
+                                    if($k<$num_of_words){
+                                        $words_sen.=$query_array[$k]." ";
+                                        //print_r("k: ".$i."\n");
+                                        $k++;
+                                    }
+                                    
+                                }
+                                //print_r("line: ".$words_sen."\n");
+                                //print_r("\n");
+
+                                $check = check_match($text,$words_sen);
+
+                                //print_r("check: ".$check."\n");
+
+
+                                if($check!==""){
+                                    $matched++;
+                                    //$matched_value.= $check."।";
+                                    $match_file[$id]["score"]=$score;
+                                    $match_file[$id]["type"]=$type;
+                                    $match_file[$id][] = $check;
+                                    
+                                    //break;
+                                    
+                                }
+                                else{
+                                    //print_r($query);
+                                    $not_match_file[$id][] = $query."।";
+                                    $not_matched++;
+                                }
+                            }
+
+                        }
+                        
+
+
+                        //print_r(sizeof($query_array));
+
+
+
+                        
+
+                        //print_r("\n");
+                        //print_r($check);
+
+                        
                     }
                 }
             }
         }
-    }
 
+    }
 }
 
-//print_r($match_file);
-//print_r($size);
-//print_r($not_match_file);
+
 
 
 $size = $sizes-1;
@@ -317,26 +191,39 @@ if($matched>$size){
         $matched =$matched-1;
     }
 }
+
+if($size==0){
+    $size=1;
+}
+
 $percentage = 100-(($size-$matched)*100)/$size;
+if($percentage>100){
+    $percentage = 100 - $percentage;
+}
 $percentage = number_format((float)$percentage, 2, '.', '');
 $type="url";
 //print_r($match_file);
-foreach($match_file as  $key=>$value){
-    $matched_value="";
-    $id = $key;
-    //print_r($value['type']);
-    $type = $value['type'];
-    
-    foreach ($value as $key1 => $value1) {
-        if($key1!="type"){
-            $matched_value.= $value1;
-            //print_r($key1);
+if (is_array($match_file) || is_object($match_file))
+{
+    foreach($match_file as  $key=>$value){
+        $matched_value="";
+        $id = $key;
+        //print_r($value['type']);
+        $type = $value['type'];
+        $score = $value['score'];
+        
+        foreach ($value as $key1 => $value1) {
+            if($key1!="type" && $key1!="score"){
+                $matched_value.= $value1;
+                //print_r($key1);
+            }
+
         }
+        $myArray[] = array("id" => $id,"type" => $type,"value" => $matched_value, "percentage" => $score);
+        //print_r($key);
+        //print_r($value);
+        //print_r($matched_value);
     }
-    $myArray[] = array("id" => $id,"type" => $type,"value" => $matched_value, "percentage" => $percentage);
-    //print_r($key);
-    //print_r($value);
-    //print_r($matched_value);
 }
 
 function check_match($result,$query){
@@ -348,88 +235,23 @@ function check_match($result,$query){
         if (strpos($result, $query) !== false) {
             $matched_value.=$query;
         }
-        else{
-            /* print_r("res:".$result);
-            print_r("qu:".$query);
-            $pos = strpos($result, $query);
-            print_r("pos: ".$pos); */
-        }
     }
     
     return $matched_value;
 }
 
-/* function check_match($result,$query){
-    $matched_value = "";
-    $query_explode = explode("।",$query);
-    foreach($query_explode as $query){
-        if (strcmp($query, $result) !== 0) {
-            //$matched_value.=$result;
-            $result_explode = explode("\n",$result);
-            foreach($result_explode as $result){
-                if (strcmp($query, $result) !== 0) 
-                {
-                    $result_explode = explode("\t",$result);
-                    foreach($result_explode as $result){
-                        if (strcmp($query, $result) !== 0) 
-                        {
-                            
-                        }
-                        else {
-                            $matched_value.=$result;
-                
-                        }
-                    }
-                }
-                else {
-                    $matched_value.=$result;
-        
-                }
-            }
-
-
-        }
-        else {
-            $matched_value.=$result;
-
-        }
-    }
+function get_list_of_words($query){
     
-    return $matched_value;
-} */ 
+    $query_array = explode(' ', $query);
 
-//print_r($myArray);
+    //print_r($query_array);
 
-/* foreach($json as $key=>$value)
-{
-    //echo $key;
-
-    if($key=="data"){
-        foreach ($value as $key1 => $value1) {
-            
-            //print_r($value1['id']);
-            //echo '</br>';
-            $id = $value1['id'];
-            $text = $value1['value'];
-    
-
-            $url = "http://127.0.0.1:5000/api/compare";
-            $percentage = curlCompare($text, $query, $url);
-
-            
-
-            
-            $myArray[] = array("id" => $id,"value" => $text, "percentage" => $percentage);
-
-            //print_r($firstArray);
-            
-        }
-    }
-} */
+    return $query_array;
 
 
+}
 
-//echo $query;
+
 //convert to json
 $json = json_encode($myArray, JSON_UNESCAPED_UNICODE);
 
