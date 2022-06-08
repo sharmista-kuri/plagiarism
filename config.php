@@ -3,8 +3,9 @@
     define('PYTHON_URL', "http://127.0.0.1:5000/api/parsing/doc");
     define('JAVA_SEARCH_URL', "http://127.0.0.1:8082/api/example/search");
     define('JAVA_STORE_URL', "http://127.0.0.1:8082/api/example/store");
-    define('WORD_COUNT', "3");
+    define('WORD_COUNT', "4");
     $UploadDirectory = $_SERVER['DOCUMENT_ROOT'] ."/plagiarism/document_file/";
+    $PATH = "http://localhost/plagiarism/document_file/";
 
 ?>
 

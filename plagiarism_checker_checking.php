@@ -8,6 +8,7 @@ $NewFileNameEnq = "";
 
 $GUID = $_POST['GUID'];
 $top = $_POST['top'];
+$analysis_type = $_POST['analysis_type'];
 
 if(!empty($_FILES) && $_FILES['file_upload']['name'] !="" && $_FILES['file_upload']['tmp_name']!="")
 {
@@ -114,41 +115,34 @@ if (is_array($json) || is_object($json))
 
 
                         
-                        $query_array = get_list_of_words($query);
                         
-                        $k=0;
-                        
-
-                        $num_of_words = sizeof($query_array) - 1;
 
                         //print_r("line: ".($num_of_words)."\n");
-                    
-                        for($i = 0; $i < $num_of_words; $i++){
-                            $k=$i;
-                            if($k%WORD_COUNT==0){
+                        
+
+                        if($analysis_type==2){
+                            
+
+                            $query_array = get_list_of_words($query);
+                        
+                            $k=0;
+                            
+
+                            $num_of_words = sizeof($query_array) - 1;
+                            for($i = 0; $i < $num_of_words; $i++){
                                 $words_sen="";
-                                for($j = 0; $j < WORD_COUNT; $j++){
-                                    if($k<$num_of_words){
-                                        $words_sen.=$query_array[$k]." ";
-                                        //print_r("k: ".$i."\n");
-                                        $k++;
-                                    }
-                                    
+                                for($i1=$i;$i1<$i+WORD_COUNT && $i1<$num_of_words; $i1++) {
+                                    $words_sen.=$query_array[$i1]." ";
                                 }
-                                //print_r("line: ".$words_sen."\n");
-                                //print_r("\n");
 
                                 $check = check_match($text,$words_sen);
-
-                                //print_r("check: ".$check."\n");
-
 
                                 if($check!==""){
                                     $matched++;
                                     //$matched_value.= $check."।";
                                     $match_file[$id]["score"]=$score;
                                     $match_file[$id]["type"]=$type;
-                                    $match_file[$id][] = $check;
+                                    $match_file[$id][] = $check." </br>";
                                     
                                     //break;
                                     
@@ -159,19 +153,28 @@ if (is_array($json) || is_object($json))
                                     $not_matched++;
                                 }
                             }
-
                         }
+                        else{
+                            $check = check_match($text,$query);
+
+                            if($check!==""){
+                                $matched++;
+                                //$matched_value.= $check."।";
+                                $match_file[$id]["score"]=$score;
+                                $match_file[$id]["type"]=$type;
+                                $match_file[$id][] = $check." </br>";
+                                
+                                //break;
+                                
+                            }
+                            else{
+                                //print_r($query);
+                                $not_match_file[$id][] = $query."।";
+                                $not_matched++;
+                            }
+                        }
+
                         
-
-
-                        //print_r(sizeof($query_array));
-
-
-
-                        
-
-                        //print_r("\n");
-                        //print_r($check);
 
                         
                     }
@@ -181,6 +184,10 @@ if (is_array($json) || is_object($json))
 
     }
 }
+
+
+
+
 
 
 
@@ -210,7 +217,13 @@ if (is_array($match_file) || is_object($match_file))
         $id = $key;
         //print_r($value['type']);
         $type = $value['type'];
-        $score = $value['score'];
+        
+        if($analysis_type==2){
+            $score = $value['score'];
+        }
+        else{
+            $score = $percentage;
+        }
         
         foreach ($value as $key1 => $value1) {
             if($key1!="type" && $key1!="score"){

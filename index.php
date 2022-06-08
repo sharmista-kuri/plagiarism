@@ -1,7 +1,7 @@
 <?php session_start();?>
 <?php
     include "config.php";
-    $PATH = $UploadDirectory;
+    //$PATH = $UploadDirectory;
 ?>
 <?php
     $show=0;
@@ -71,7 +71,7 @@
                 <div class="collapse navbar-collapse" id="navbarTogglerDemo03">
                     <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
                         <li class="nav-item active">
-                            <a class="nav-link" href="plagiarism_checker.php">Plagiarism <span class="sr-only">(current)</span></a>
+                            <a class="nav-link" href="index.php">Plagiarism <span class="sr-only">(current)</span></a>
                         </li>
                         <?php 
                             if($show){?>
@@ -140,7 +140,8 @@
                                     <button id="url_button" onclick="url_indexing()" type="button" class="btn btn-info">Website Index</button>
                                     <button id="index_button" onclick="indexing()" type="button" class="btn btn-info">Document Index</button>
                             <?php } ?>
-                                <button id="checking_button" onclick="checking()" type="button" class="btn btn-info">Scan for plagarism</button>
+                                <button id="checking_button" onclick="checking(1)" type="button" class="btn btn-info">Line by line analysis</button>
+                                <button id="checking_button" onclick="checking(2)" type="button" class="btn btn-info">Deep analysis</button>
                             </div>
                         </form>
                     </div>
@@ -205,7 +206,7 @@
             $("#file_upload").trigger('click');
         }
 
-        function checking(){
+        function checking(analysis_type){
             // $("#datatable tbody").html("");
             // $('#datatable').DataTable();
 
@@ -219,149 +220,164 @@
 		    var data = new FormData(form);
             //console.log($( '#file_upload' ).files);
             //console.log(form);
-            //console.log(pond.FileStatus);
+            //console.log(pond.Status);
             pondFiles = pond.getFiles();
- 
+            //console.log(pondFiles);
             //console.log(pondFiles[0].file);
-
-
-            var guid = "";
+            if(pondFiles.length!=0){
+                var guid = "";
             
-            get_guid();
+                get_guid();
 
-            var GUID = $("#guid").val();
+                var GUID = $("#guid").val();
 
-            data = new FormData();
-            //data.append( 'file_upload', $( '#file_upload' )[0].files );
-            data.append( 'file_upload', pondFiles[0].file );
-            data.append( 'GUID', GUID);
-            data.append( 'top', $("#top").val());
-            //console.log(data);
-            url = "plagiarism_checker_checking.php";
-           
-            jQuery.ajax({
-                type: "POST",
-                url: url,
-                data : data,
-                cache: false,
-                processData: false,
-                contentType: false,
-                datatype: "html",
-                enctype: 'multipart/form-data',
-                success: function(data){
-                    $("#checking_button").show();
-                    $("#loading").hide();
-                    console.log(data);
-                    datas = $.parseJSON(data);
-                    //console.log(datas);
-                    var str="";
-                    var name = "query";
-                    var query = "";
-                    var i = 0;
-                    var n = 200;
-                    var dir = "<?=$PATH?>";
-                    
-                    $("#tbody").html("");
-                    $.each( datas, function( key, value ) {
+                data = new FormData();
+                //data.append( 'file_upload', $( '#file_upload' )[0].files );
+                data.append( 'file_upload', pondFiles[0].file );
+                data.append( 'GUID', GUID);
+                data.append( 'top', $("#top").val());
+                data.append( 'analysis_type', analysis_type);
+                //console.log(data);
+                url = "plagiarism_checker_checking.php";
+            
+                jQuery.ajax({
+                    type: "POST",
+                    url: url,
+                    data : data,
+                    cache: false,
+                    processData: false,
+                    contentType: false,
+                    datatype: "html",
+                    enctype: 'multipart/form-data',
+                    success: function(data){
+                        $("#checking_button").show();
+                        $("#loading").hide();
+                        console.log(data);
+                        datas = $.parseJSON(data);
+                        //console.log(datas);
+                        var str="";
+                        var name = "query";
+                        var query = "";
+                        var i = 0;
+                        var n = 200;
+                        var dir = "<?=$PATH?>";
                         
-                        //var file_path = "";
-                        
-                        if(name in value){
-                            query = value['query'];
-                            query =  query.replace('"', ' ');
-                            $("#query_txt").text(query);
-                            if(query.length > n) {
-                                query = query.substring(0,n);
-                                query = query+".....";
-                            }
+                        $("#tbody").html("");
+                        $.each( datas, function( key, value ) {
                             
-
-                        }
-                        else{
-                            i++;
-                            //console.log(value['id']);
-                            //console.log(value['value']);
-                            //console.log(value['percentage']);
+                            //var file_path = "";
                             
-                            name = value['value'];
-
-                            name =  name.replace('"', ' ');
-
-                            if(name.length > n) {
-                                name = name.substring(0,n);
-                                name = name+".....";
-                            }
-
-                            id = value['id'];
-                            search_type = value['type'];
-                            download_url_str = "";
-                            
-                            if(search_type=="file"){
-                                get_file(id);
-
-                                file_path = $("#file_path").val();
-                                
-                                
-                                
+                            if(name in value){
+                                query = value['query'];
+                                query =  query.replace('"', ' ');
+                                $("#query_txt").text(query);
+                                if(query.length > n) {
+                                    query = query.substring(0,n);
+                                    query = query+".....";
+                                }
                                 
 
-                                download_url_str='<a id="download_link_'+i+'" download href="'+file_path+'"><i style="color:#11a683" class="fa fa-download"> File</i></a>';
-                                
                             }
                             else{
-
-                                check = id.search('xampp');
+                                i++;
+                                //console.log(value['id']);
+                                //console.log(value['value']);
+                                //console.log(value['percentage']);
                                 
-                                if(check!=-1){
-                                    link_path_split = id.split('\\');
-                                    //console.log(link_path_split);
-                                    link_path = link_path_split[link_path_split.length - 1];
-                                    link_code= link_path.replace(".html", "");
-                                    id= "https://bn.wikipedia.org/wiki/"+link_code;
+                                name = value['value'];
+
+                                name =  name.replace('"', ' ');
+
+                                if(name.length > n) {
+                                    name = name.substring(0,n);
+                                    name = name+".....";
                                 }
-                                download_url_str='<a target="_blank" id="download_link_'+i+'" href="'+id+'"><i style="color:#11a683" class="fa fa-link"> File Link</i></a>';
+
+                                id = value['id'];
+                                search_type = value['type'];
+                                download_url_str = "";
+                                
+                                if(search_type=="file"){
+                                    get_file(id);
+
+                                    file_path = $("#file_path").val();
+                                    
+                                    
+                                    
+                                    
+
+                                    download_url_str='<a id="download_link_'+i+'" download href="'+file_path+'"><i style="color:#11a683" class="fa fa-download"> File</i></a>';
+                                    
+                                }
+                                else{
+
+                                    check = id.search('xampp');
+                                    
+                                    if(check!=-1){
+                                        
+                                        //console.log(id);
+                                        link_path_split = id.split('\\');
+                                        //console.log(link_path_split);
+                                        first_element = link_path_split[0];
+                                        sec_element = link_path_split[1];
+                                        if(first_element=="E:"&& sec_element=="xampp"){
+                                            link_path = link_path_split[link_path_split.length - 1];
+                                            link_code= link_path.replace(".html", "");
+                                            id= "https://bn.wikipedia.org/wiki/"+link_code;
+                                        }
+                                        
+                                    }
+                                    download_url_str='<a target="_blank" id="download_link_'+i+'" href="'+id+'"><i style="color:#11a683" class="fa fa-link"> File Link</i></a>';
+                                }
+
+                                
+                                
+                                
+                            
+                                //console.log(file_path);
+
+                                
+
+                                str+="<tr>";
+                                str+="<td>"+i+"</td>";
+                                str+="<td>"+query+"</td>";
+                                str+="<td>";
+                                str+='<input type="hidden" id="percentage_'+i+'" value='+value['percentage']+'>';
+                                str+='<canvas id="myChart_'+i+'" width="200" height="50"></canvas>';
+                                str+="</td>"
+                                str+="<td>"+name+"</td>";
+                                str+= "<td>"+download_url_str+"</td>";
+                                str+="</tr>";
+
                             }
-
                             
                             
                             
-                           
-                            //console.log(file_path);
+                        });
+                        $("#datatable tbody").append(str);
 
-                            
-
-                            str+="<tr>";
-                            str+="<td>"+i+"</td>";
-                            str+="<td>"+query+"</td>";
-                            str+="<td>";
-                            str+='<input type="hidden" id="percentage_'+i+'" value='+value['percentage']+'>';
-                            str+='<canvas id="myChart_'+i+'" width="200" height="50"></canvas>';
-                            str+="</td>"
-                            str+="<td>"+name+"</td>";
-                            str+= "<td>"+download_url_str+"</td>";
-                            str+="</tr>";
-
+                        for(j=1; j<=i; j++){
+                            create_canvas(j);
                         }
-                        
-                        
-                        
-                    });
-                    $("#datatable tbody").append(str);
 
-                    for(j=1; j<=i; j++){
-                        create_canvas(j);
+                        $("#counter").val(i);
+                        $('#datatable').DataTable();
+                        
+                    
+                        
+                    },
+                    error: function(data) {
+                        
                     }
+                });
+            }
 
-                    $("#counter").val(i);
-                    $('#datatable').DataTable();
-                    
-                
-                    
-                },
-                error: function(data) {
-                    
-                }
-            });
+            else{
+                $("#checking_button").show();
+                $("#loading").hide();
+            }
+
+            
 
             
            

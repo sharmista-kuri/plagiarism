@@ -29,7 +29,7 @@
             $_SESSION['user_type']=$row['user_type'];
 
 
-            echo("<script>location.href = 'plagiarism_checker.php';</script>");
+            echo("<script>location.href = 'index.php';</script>");
         }
         
     } 
