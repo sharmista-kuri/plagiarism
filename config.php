@@ -1,5 +1,6 @@
 <?php
     define('SERVER_URL', "http://localhost/plagiarism/");
+    define('PYTHON_PDF_URL', "http://127.0.0.1:5000/api/parsing/pdf");
     define('PYTHON_URL', "http://127.0.0.1:5000/api/parsing/doc");
     define('JAVA_SEARCH_URL', "http://127.0.0.1:8082/api/example/search");
     define('JAVA_STORE_URL', "http://127.0.0.1:8082/api/example/store");

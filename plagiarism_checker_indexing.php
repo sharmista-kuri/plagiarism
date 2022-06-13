@@ -32,6 +32,11 @@ if($File_Ext==".doc"||$File_Ext==".docx")
     $url = PYTHON_URL;
     $res = curlSendFile(new CURLFile($file_name), $url);
 }
+elseif($File_Ext==".pdf")
+{
+    $url = PYTHON_PDF_URL;
+    $res = curlSendFile(new CURLFile($file_name), $url);
+}
 
 elseif($File_Ext==".txt")
 {

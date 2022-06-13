@@ -190,6 +190,7 @@
                 instantUpload: false,
                 allowProcess: false,
                 allowFileTypeValidation: true,
+                //acceptedFileTypes: ['.pdf','application/pdf','.doc','.docx','application/msword','application/vnd.openxmlformats-officedocument.wordprocessingml.document'],
                 acceptedFileTypes: ['.doc','.docx','application/msword','application/vnd.openxmlformats-officedocument.wordprocessingml.document'],
 
                 
